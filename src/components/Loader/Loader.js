@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
+import Loader from 'react-loader-spinner';
+import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
+import s from './Spinner.module.css';
 
-class Loader extends Component {
+export default class Spinner extends Component {
+  //other logic
   render() {
-    return <>тут будет спиннер</>;
+    return <Loader type="ThreeDots" color="#00BFFF" height={80} width={80} />;
   }
 }
-
-export default Loader;
