@@ -75,10 +75,11 @@ export default class ImageGallery extends Component {
         .then(response => response.json())
         .then(images => {
           if (images.length > 0) {
-            this.setState({ images });
+            return this.setState({ images, status: 'resolved' });
           } else {
             this.setState({
               error: `по запросу ${this.props.searchQuery} ничего не найдено`,
+              status: 'rejected',
             });
           }
         })
