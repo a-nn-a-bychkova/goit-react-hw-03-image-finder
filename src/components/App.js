@@ -36,9 +36,9 @@ class App extends Component {
         <Searchbar>
           <Searchform onSubmit={this.handleFormSubmit} />
         </Searchbar>
-        {this.state.searchQuery && (
-          <ImageGallery searchQuery={this.state.searchQuery} />
-        )}
+
+        <ImageGallery searchQuery={this.state.searchQuery} />
+
         {/* <Button /> */}
 
         {/* <Modal /> */}
