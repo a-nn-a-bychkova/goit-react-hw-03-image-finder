@@ -50,7 +50,62 @@ export default class ImageGallery extends Component {
   }
 }
 
-// {
-//   /*
-//       ))} */
+//code with statuses
+// const Status = {
+//   IDLE: 'idle',
+//   PENDING: 'pending',
+//   RESOLVED: 'resolved',
+//   REJECTED: 'rejected',
+// };
+// ​
+// export default class ImageGallery extends Component {
+//   state = { images: null, error: null, status: Status.IDLE };
+// ​
+//   componentDidUpdate(prevProps, prevState) {
+//     if (prevProps.searchQuery !== this.props.searchQuery) {
+//       // console.log('предыдущие пропы', prevProps.searchQuery);
+//       // console.log('текущие пропы', this.props.searchQuery);
+//       this.setState({ status: Status.PENDING });
+// ​
+//       fetch(
+//         `https://pixabay.com/api/?q=${this.props.searchQuery}&page=1&key=19110749-e340c63922b3f8a4d502270f7&image_type=photo&orientation=horizontal&per_page=12`,
+//       )
+//         .then(response => {
+//           if (response.ok) {
+//             return response.json();
+//           }
+//           return Promise.reject(
+//             new Error(`по запросу ${this.props.searchQuery} ничего не найдено`),
+//           );
+//         })
+//         .then(images => this.setState({ images, status: Status.RESOLVED }))
+//         .catch(error => this.setState({ error, status: Status.REJECTED }));
+//     }
+//   }
+// ​
+//   render() {
+//     const { error, images, status } = this.state;
+// ​
+//     if (status === 'pending') {
+//       return <Loader />;
+//     }
+//     if (status === 'rejected') {
+//       return <h1>{error.message}</h1>;
+//     }
+// ​
+//     if (status === 'resolved') {
+//       return (
+//         <ul className={s.ImageGallery}>
+//           {images.hits.map(image => (
+//             <ImageGalleryItem
+//               id={image.id}
+//               smallPicture={image.webformatURL}
+//               largePicture={image.largeImageURL}
+//             />
+//           ))}
+//         </ul>
+//       );
+//     }
+
+//   }
 // }
