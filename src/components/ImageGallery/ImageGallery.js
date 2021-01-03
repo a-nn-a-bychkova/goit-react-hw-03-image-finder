@@ -2,60 +2,8 @@ import React, { Component } from 'react';
 import s from './ImageGallery.module.css';
 import ImageGalleryItem from '../ImageGalleryItem';
 import Loader from '../Loader';
-
-// export default class ImageGallery extends Component {
-//   state = { images: null, loading: false, error: null };
-
-//   componentDidUpdate(prevProps, prevState) {
-//     const { searchQuery } = this.props;
-
-//     if (prevProps.searchQuery !== searchQuery) {
-//       // console.log('предыдущие пропы', prevProps.searchQuery);
-//       // console.log('текущие пропы', searchQuery);
-//       this.setState({ loading: true, images: null });
-
-//       fetch(
-//         `https://pixabay.com/api/?q=${searchQuery}&page=1&key=19110749-e340c63922b3f8a4d502270f7&image_type=photo&orientation=horizontal&per_page=12`,
-//       )
-//         .then(response => response.json())
-//         .then(images => {
-//           if (images.length > 0) {
-//             return this.setState({ images });
-//           }
-
-//           return Promise.reject(
-//             new Error(`по запросу ${searchQuery} ничего не найдено`),
-//           );
-//         })
-
-//         .catch(error => this.setState({ error }))
-//         .finally(() => this.setState({ loading: false }));
-//     }
-//   }
-
-//   render() {
-//     const { error, images, loading } = this.state;
-//     return (
-//       <div>
-//         {error && <h1>{error.message}</h1>}
-//         {loading && <Loader />}
-//         {images && (
-//           <ul className={s.ImageGallery}>
-//             {images.hits.map((image, index) => (
-//               <ImageGalleryItem
-//                 key={`${image.id}${index}`}
-//                 smallPicture={image.webformatURL}
-//                 largePicture={image.largeImageURL}
-//               />
-//             ))}
-//           </ul>
-//         )}
-//       </div>
-//     );
-//   }
-// }
-
-//code with statuses
+import Button from '../Button';
+import imageAPI from '../services/images-api';
 
 // const Status = {
 //   IDLE: 'idle',
@@ -65,29 +13,42 @@ import Loader from '../Loader';
 // };
 
 export default class ImageGallery extends Component {
-  state = { images: null, error: null, status: 'idle' };
+  state = { images: null, error: null, status: 'idle', page: 1 };
+
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.searchQuery !== this.props.searchQuery) {
+    if (
+      prevProps.searchQuery !== this.props.searchQuery ||
+      prevState.page !== this.state.page
+    ) {
       this.setState({ status: 'pending' });
       fetch(
-        `https://pixabay.com/api/?q=${this.props.searchQuery}&page=1&key=19110749-e340c63922b3f8a4d502270f7&image_type=photo&orientation=horizontal&per_page=12`,
+        `https://pixabay.com/api/?q=${this.props.searchQuery}&page=${this.state.page}&key=19110749-e340c63922b3f8a4d502270f7&image_type=photo&orientation=horizontal&per_page=12`,
       )
         .then(response => response.json())
         .then(images => {
-          if (images.length > 0) {
-            return this.setState({ images, status: 'resolved' });
-          } else {
-            this.setState({
-              error: `по запросу ${this.props.searchQuery} ничего не найдено`,
-              status: 'rejected',
+          if (images.hits.length > 0) {
+            return this.setState({
+              // images,
+              images: [...prevState.images.hits, this.state.images.hits],
+              status: 'resolved',
             });
           }
+          return this.setState({
+            error: `по запросу ${this.props.searchQuery} ничего не найдено`,
+            status: 'rejected',
+          });
         })
         .catch(error => this.setState({ error, status: 'rejected' }));
     }
   }
+
+  changePageNumber = page => {
+    this.setState({ page: this.state.page + 1 });
+  };
+
   render() {
     const { error, images, status } = this.state;
+
     if (status === 'idle') {
       return <></>;
     }
@@ -95,19 +56,22 @@ export default class ImageGallery extends Component {
       return <Loader />;
     }
     if (status === 'rejected') {
-      return <h1>{error.message}</h1>;
+      return <h1>{error}</h1>;
     }
     if (status === 'resolved') {
       return (
-        <ul className={s.ImageGallery}>
-          {images.hits.map((image, index) => (
-            <ImageGalleryItem
-              key={`${image.id}${index}`}
-              smallPicture={image.webformatURL}
-              largePicture={image.largeImageURL}
-            />
-          ))}
-        </ul>
+        <div>
+          <ul className={s.ImageGallery}>
+            {images.hits.map((image, index) => (
+              <ImageGalleryItem
+                key={`${image.id}${index}`}
+                smallPicture={image.webformatURL}
+                largePicture={image.largeImageURL}
+              />
+            ))}
+          </ul>
+          <Button onClick={this.changePageNumber} />
+        </div>
       );
     }
   }

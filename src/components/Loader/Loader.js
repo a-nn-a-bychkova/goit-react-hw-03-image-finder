@@ -6,6 +6,10 @@ import s from './Spinner.module.css';
 export default class Spinner extends Component {
   //other logic
   render() {
-    return <Loader type="ThreeDots" color="#00BFFF" height={80} width={80} />;
+    return (
+      <div className={s.div}>
+        <Loader type="ThreeDots" color="#00BFFF" height={80} width={80} />
+      </div>
+    );
   }
 }
