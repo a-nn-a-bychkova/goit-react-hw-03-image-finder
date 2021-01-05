@@ -3,6 +3,7 @@ import s from './ImageGallery.module.css';
 import ImageGalleryItem from '../ImageGalleryItem';
 import Loader from '../Loader';
 import Button from '../Button';
+// import Modal from '../Modal';
 import imageAPI from '../services/images-api';
 
 // const Status = {
@@ -13,7 +14,13 @@ import imageAPI from '../services/images-api';
 // };
 
 export default class ImageGallery extends Component {
-  state = { images: null, error: null, status: 'idle', page: 1 };
+  state = {
+    images: [],
+    error: null,
+    status: 'idle',
+    page: 1,
+    // showModal: true,
+  };
 
   componentDidUpdate(prevProps, prevState) {
     if (
@@ -21,17 +28,16 @@ export default class ImageGallery extends Component {
       prevState.page !== this.state.page
     ) {
       this.setState({ status: 'pending' });
-      fetch(
-        `https://pixabay.com/api/?q=${this.props.searchQuery}&page=${this.state.page}&key=19110749-e340c63922b3f8a4d502270f7&image_type=photo&orientation=horizontal&per_page=12`,
-      )
-        .then(response => response.json())
-        .then(images => {
-          if (images.hits.length > 0) {
-            return this.setState({
-              // images,
-              images: [...prevState.images.hits, this.state.images.hits],
+
+      imageAPI
+        .fetchImage(this.props.searchQuery, this.state.page)
+        .then(newImages => {
+          console.log(newImages);
+          if (newImages.hits.length > 0) {
+            return this.setState(prevState => ({
+              images: [...prevState.images, ...newImages.hits],
               status: 'resolved',
-            });
+            }));
           }
           return this.setState({
             error: `по запросу ${this.props.searchQuery} ничего не найдено`,
@@ -40,11 +46,28 @@ export default class ImageGallery extends Component {
         })
         .catch(error => this.setState({ error, status: 'rejected' }));
     }
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'smooth',
+    });
   }
 
   changePageNumber = page => {
     this.setState({ page: this.state.page + 1 });
   };
+
+  handleImgClick = event => {
+    if (event.target.tagName === 'IMG') {
+      this.props.onClick(event.target.dataset.url, event.target.alt);
+    }
+  };
+  // onToggleModal = () => {
+  //   this.setState(({ showModal }) => ({ showModal: !showModal }));
+  // };
+
+  // onModalOpen = largePicture => {
+  //   console.log(largePicture);
+  // };
 
   render() {
     const { error, images, status } = this.state;
@@ -61,12 +84,13 @@ export default class ImageGallery extends Component {
     if (status === 'resolved') {
       return (
         <div>
-          <ul className={s.ImageGallery}>
-            {images.hits.map((image, index) => (
+          <ul className={s.ImageGallery} onClick={this.handleImgClick}>
+            {images.map((image, index) => (
               <ImageGalleryItem
                 key={`${image.id}${index}`}
                 smallPicture={image.webformatURL}
                 largePicture={image.largeImageURL}
+                alt={image.tags}
               />
             ))}
           </ul>
