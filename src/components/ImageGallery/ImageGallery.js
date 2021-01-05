@@ -3,8 +3,8 @@ import s from './ImageGallery.module.css';
 import ImageGalleryItem from '../ImageGalleryItem';
 import Loader from '../Loader';
 import Button from '../Button';
-// import Modal from '../Modal';
 import imageAPI from '../services/images-api';
+import PropTypes from 'prop-types';
 
 // const Status = {
 //   IDLE: 'idle',
@@ -14,23 +14,29 @@ import imageAPI from '../services/images-api';
 // };
 
 export default class ImageGallery extends Component {
+  static propTypes = {
+    searchQuery: PropTypes.string.isRequired,
+    onClick: PropTypes.func.isRequired,
+  };
+
   state = {
     images: [],
     error: null,
     status: 'idle',
     page: 1,
-    // showModal: true,
   };
 
   componentDidUpdate(prevProps, prevState) {
+    const currentSearchQuery = this.props.searchQuery;
+    const currentPage = this.state.page;
     if (
-      prevProps.searchQuery !== this.props.searchQuery ||
-      prevState.page !== this.state.page
+      prevProps.searchQuery !== currentSearchQuery ||
+      prevState.page !== currentPage
     ) {
       this.setState({ status: 'pending' });
 
       imageAPI
-        .fetchImage(this.props.searchQuery, this.state.page)
+        .fetchImage(currentSearchQuery, currentPage)
         .then(newImages => {
           console.log(newImages);
           if (newImages.hits.length > 0) {
@@ -40,7 +46,7 @@ export default class ImageGallery extends Component {
             }));
           }
           return this.setState({
-            error: `по запросу ${this.props.searchQuery} ничего не найдено`,
+            error: `по запросу ${currentSearchQuery} ничего не найдено`,
             status: 'rejected',
           });
         })
@@ -61,13 +67,6 @@ export default class ImageGallery extends Component {
       this.props.onClick(event.target.dataset.url, event.target.alt);
     }
   };
-  // onToggleModal = () => {
-  //   this.setState(({ showModal }) => ({ showModal: !showModal }));
-  // };
-
-  // onModalOpen = largePicture => {
-  //   console.log(largePicture);
-  // };
 
   render() {
     const { error, images, status } = this.state;

@@ -1,8 +1,12 @@
 import { Component } from 'react';
 import { toast } from 'react-toastify';
 import s from './Searchform.module.css';
+import PropTypes from 'prop-types';
 
 export default class Searchform extends Component {
+  static propTypes = {
+    onSubmit: PropTypes.func.isRequired,
+  };
   state = {
     searchQuery: '',
   };
@@ -12,18 +16,20 @@ export default class Searchform extends Component {
   };
 
   handleSubmit = event => {
+    const { searchQuery } = this.state;
+    const { onSubmit } = this.props;
     event.preventDefault();
-    if (this.state.searchQuery.trim() === '') {
+    if (searchQuery.trim() === '') {
       // toast.error('The request is empty');
 
       return alert('The request is empty');
     }
-    // onSubmit is prop here
-    this.props.onSubmit(this.state.searchQuery);
+    onSubmit(searchQuery);
     this.setState({ searchQuery: '' });
   };
 
   render() {
+    const { searchQuery } = this.state;
     return (
       <form onSubmit={this.handleSubmit} className={s.SearchForm}>
         <button type="submit" className={s.button}>
@@ -36,7 +42,7 @@ export default class Searchform extends Component {
           autoComplete="off"
           autoFocus
           placeholder="Search images and photos"
-          value={this.state.searchQuery}
+          value={searchQuery}
           onChange={this.handleSearchQueryChange}
         />
       </form>

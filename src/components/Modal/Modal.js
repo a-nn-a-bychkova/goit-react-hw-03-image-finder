@@ -7,8 +7,13 @@ import { doc } from 'prettier';
 
 const modalRoot = document.querySelector('#modal-root');
 export default class Modal extends Component {
+  static propTypes = {
+    src: PropTypes.string.isRequired,
+    alt: PropTypes.arrayOf(PropTypes.string).isRequired,
+    onClose: PropTypes.func.isRequired,
+  };
+
   componentDidMount() {
-    console.log('component did mount');
     window.addEventListener('keydown', this.handleKeyDown);
   }
 
@@ -29,10 +34,11 @@ export default class Modal extends Component {
   };
 
   render() {
+    const { src, alt } = this.props;
     return createPortal(
       <div className={s.Overlay} onClick={this.handleBackdropClick}>
         <div className={s.Modal}>
-          <img src={this.props.src} alt={this.props.alt} />
+          <img src={src} alt={alt} />
         </div>
       </div>,
       modalRoot,

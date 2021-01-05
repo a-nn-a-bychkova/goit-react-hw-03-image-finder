@@ -4,7 +4,6 @@ import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 import s from './Spinner.module.css';
 
 export default class Spinner extends Component {
-  //other logic
   render() {
     return (
       <div className={s.div}>

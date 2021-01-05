@@ -31,22 +31,17 @@ class App extends Component {
   };
 
   render() {
+    const { searchQuery, src, alt, showModal } = this.state;
     return (
       <div>
         <Searchbar>
           <Searchform onSubmit={this.handleFormSubmit} />
         </Searchbar>
         <ImageGallery
-          searchQuery={this.state.searchQuery}
+          searchQuery={searchQuery}
           onClick={this.handleImageClick}
         />
-        {this.state.showModal && (
-          <Modal
-            src={this.state.src}
-            alt={this.state.alt}
-            onClose={this.toggleModal}
-          />
-        )}
+        {showModal && <Modal src={src} alt={alt} onClose={this.toggleModal} />}
         <ToastContainer />
       </div>
     );
