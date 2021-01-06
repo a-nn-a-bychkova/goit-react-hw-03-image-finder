@@ -1,20 +1,16 @@
 import React, { Component } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Searchbar from './Searchbar';
 import Searchform from './Searchform';
 import ImageGallery from './ImageGallery';
-import ImageGalleryItem from './ImageGalleryItem';
-import Button from './Button';
 import Modal from './Modal';
-import fetchImage from './services/images-api';
-import s from './App.module.css';
-import { ToastContainer, toast } from 'react-toastify';
 
 class App extends Component {
   state = {
     searchQuery: '',
     showModal: false,
-    src: '',
-    alt: '',
+    largeImage: { src: '', alt: '' },
   };
 
   handleFormSubmit = searchQuery => {
@@ -22,7 +18,7 @@ class App extends Component {
   };
 
   handleImageClick = (src, alt) => {
-    this.setState({ src, alt });
+    this.setState({ largeImage: { src, alt } });
     this.toggleModal();
   };
 
@@ -31,7 +27,7 @@ class App extends Component {
   };
 
   render() {
-    const { searchQuery, src, alt, showModal } = this.state;
+    const { searchQuery, largeImage, showModal } = this.state;
     return (
       <div>
         <Searchbar>
@@ -41,7 +37,13 @@ class App extends Component {
           searchQuery={searchQuery}
           onClick={this.handleImageClick}
         />
-        {showModal && <Modal src={src} alt={alt} onClose={this.toggleModal} />}
+        {showModal && (
+          <Modal
+            src={largeImage.src}
+            alt={largeImage.alt}
+            onClose={this.toggleModal}
+          />
+        )}
         <ToastContainer />
       </div>
     );

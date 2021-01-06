@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import api from '../services/images-api';
+import api from '../../services/images-api';
 import s from './ImageGalleryItem.module.css';
 import PropTypes from 'prop-types';
 

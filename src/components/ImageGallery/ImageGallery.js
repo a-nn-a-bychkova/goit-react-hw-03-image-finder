@@ -3,15 +3,15 @@ import s from './ImageGallery.module.css';
 import ImageGalleryItem from '../ImageGalleryItem';
 import Loader from '../Loader';
 import Button from '../Button';
-import imageAPI from '../services/images-api';
+import imageAPI from '../../services/images-api';
 import PropTypes from 'prop-types';
 
-// const Status = {
-//   IDLE: 'idle',
-//   PENDING: 'pending',
-//   RESOLVED: 'resolved',
-//   REJECTED: 'rejected',
-// };
+const Status = {
+  IDLE: 'idle',
+  PENDING: 'pending',
+  RESOLVED: 'resolved',
+  REJECTED: 'rejected',
+};
 
 export default class ImageGallery extends Component {
   static propTypes = {
@@ -22,40 +22,45 @@ export default class ImageGallery extends Component {
   state = {
     images: [],
     error: null,
-    status: 'idle',
+    status: Status.IDLE,
     page: 1,
   };
 
   componentDidUpdate(prevProps, prevState) {
     const currentSearchQuery = this.props.searchQuery;
     const currentPage = this.state.page;
+    if (prevProps.searchQuery !== currentSearchQuery) {
+      this.setState({ images: [], error: null, status: Status.IDLE, page: 1 });
+    }
+
     if (
       prevProps.searchQuery !== currentSearchQuery ||
       prevState.page !== currentPage
     ) {
-      this.setState({ status: 'pending' });
+      this.setState({ status: Status.PENDING });
 
       imageAPI
         .fetchImage(currentSearchQuery, currentPage)
         .then(newImages => {
-          console.log(newImages);
           if (newImages.hits.length > 0) {
-            return this.setState(prevState => ({
-              images: [...prevState.images, ...newImages.hits],
-              status: 'resolved',
-            }));
+            return (
+              this.setState(prevState => ({
+                images: [...prevState.images, ...newImages.hits],
+                status: Status.RESOLVED,
+              })),
+              window.scrollTo({
+                top: document.documentElement.scrollHeight,
+                behavior: 'smooth',
+              })
+            );
           }
           return this.setState({
             error: `по запросу ${currentSearchQuery} ничего не найдено`,
-            status: 'rejected',
+            status: Status.REJECTED,
           });
         })
-        .catch(error => this.setState({ error, status: 'rejected' }));
+        .catch(error => this.setState({ error, status: Status.REJECTED }));
     }
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'smooth',
-    });
   }
 
   changePageNumber = page => {
@@ -74,13 +79,7 @@ export default class ImageGallery extends Component {
     if (status === 'idle') {
       return <></>;
     }
-    if (status === 'pending') {
-      return <Loader />;
-    }
-    if (status === 'rejected') {
-      return <h1>{error}</h1>;
-    }
-    if (status === 'resolved') {
+    if (status === 'pending' || status === 'resolved') {
       return (
         <div>
           <ul className={s.ImageGallery} onClick={this.handleImgClick}>
@@ -93,9 +92,14 @@ export default class ImageGallery extends Component {
               />
             ))}
           </ul>
-          <Button onClick={this.changePageNumber} />
+          {status === 'resolved' && <Button onClick={this.changePageNumber} />}
+          {status === 'pending' && <Loader />}
         </div>
       );
+    }
+
+    if (status === 'rejected') {
+      return <h1>{error}</h1>;
     }
   }
 }
